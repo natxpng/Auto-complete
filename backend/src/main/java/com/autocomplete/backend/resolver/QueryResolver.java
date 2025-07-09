@@ -25,8 +25,9 @@ public class QueryResolver {
     public List<String> suggestions(@Argument String term) {
         if (term.length() < 4) return List.of();
         return suggestions.stream()
-                .filter(s -> s.toLowerCase().contains(term.toLowerCase()))
+                .filter(item -> item.toLowerCase().startsWith(term.toLowerCase()))
                 .limit(20)
-                .collect(Collectors.toList());
+                .toList();
+
     }
 }

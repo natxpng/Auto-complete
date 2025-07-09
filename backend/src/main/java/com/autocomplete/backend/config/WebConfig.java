@@ -14,8 +14,10 @@ public class WebConfig {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
                 registry.addMapping("/graphql")
-                        .allowedOrigins("http://localhost:5173")
-                        .allowedMethods("POST");
+                        .allowedOrigins("http://localhost:3000", "http://localhost:5173")
+                        .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
+                        .allowedHeaders("*")
+                        .allowCredentials(true);
             }
         };
     }

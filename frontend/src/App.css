@@ -1,42 +1,96 @@
-#root {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-  text-align: center;
-}
-
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
-}
-
-@keyframes logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
-  }
+.container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background-color: #e8ecf1;
 }
 
 .card {
-  padding: 2em;
+  display: flex;
+  align-items: center;
+  background: white;
+  padding: 24px;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
 }
 
-.read-the-docs {
-  color: #888;
+.image {
+  width: 120px;
+  height: 120px;
+  margin-right: 24px;
+  object-fit: cover;
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+}
+
+.content h1 {
+  margin: 0;
+  font-size: 28px;
+  color: #222;
+}
+
+.content p {
+  margin: 4px 0 12px;
+  color: #555;
+}
+
+.search-container {
+  display: flex;
+  align-items: center;
+}
+
+.search-container input {
+  padding: 10px;
+  width: 280px;
+  border: 1px solid #ccc;
+  border-radius: 4px 0 0 4px;
+  outline: none;
+}
+
+.search-container button {
+  padding: 10px 16px;
+  background-color: #4aa9ff;
+  border: none;
+  color: white;
+  font-weight: bold;
+  border-radius: 0 4px 4px 0;
+  cursor: pointer;
+}
+
+.suggestions {
+  max-height: 400px; /* ou 10 * altura de cada item */
+  overflow-y: auto;
+  border: 1px solid #ccc;
+  margin-top: 10px;
+  padding-left: 0;
+  list-style: none;
+}
+
+.suggestions li {
+  padding: 10px;
+  height: 40px;           /* altura fixa */
+  box-sizing: border-box; /* garante que padding não aumente o tamanho */
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+
+.suggestions li:hover {
+  background-color: #f0f0f0;
+  cursor: pointer;
+}
+
+
+.suggestions::-webkit-scrollbar {
+  width: 6px;
+}
+
+.suggestions::-webkit-scrollbar-thumb {
+  background: #ccc;
+  border-radius: 3px;
 }
