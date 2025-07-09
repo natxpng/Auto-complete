@@ -1,33 +1,23 @@
 package com.autocomplete.backend.resolver;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.autocomplete.backend.service.FraseGeneratorService;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
 import org.springframework.stereotype.Controller;
 
-import java.io.InputStream;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Controller
 public class QueryResolver {
 
-    private final List<String> suggestions;
+    private final FraseGeneratorService generator;
 
-    public QueryResolver() throws Exception {
-        ObjectMapper mapper = new ObjectMapper();
-        InputStream inputStream = getClass().getResourceAsStream("/suggestions.json");
-        this.suggestions = mapper.readValue(inputStream, new TypeReference<List<String>>() {});
+    public QueryResolver(FraseGeneratorService generator) {
+        this.generator = generator;
     }
 
     @QueryMapping
     public List<String> suggestions(@Argument String term) {
-        if (term.length() < 4) return List.of();
-        return suggestions.stream()
-                .filter(item -> item.toLowerCase().startsWith(term.toLowerCase()))
-                .limit(20)
-                .toList();
-
+        return generator.gerarSugestoes(term);
     }
 }
