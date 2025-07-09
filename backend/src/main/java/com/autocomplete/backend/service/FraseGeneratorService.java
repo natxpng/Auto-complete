@@ -13,11 +13,9 @@ public class FraseGeneratorService {
 
     private final SuggestionData data;
     private final List<String> todosSujeitos;
-    private final Random random = new Random();
 
     public FraseGeneratorService(DataLoader loader) {
         this.data = loader.getSuggestionData();
-        // Pré-carrega todos os sujeitos para otimização
         this.todosSujeitos = Stream.of(
                 data.getSujeitos().getJogadores(),
                 data.getSujeitos().getTimes(),
@@ -33,122 +31,61 @@ public class FraseGeneratorService {
 
         final String termoLimpo = termo.trim().toLowerCase(Locale.ROOT);
         String[] tokens = termoLimpo.split("\\s+");
+        String primeiroToken = tokens[0];
 
-        // 1. ENCONTRA O SUJEITO PRINCIPAL (usando apenas o primeiro token)
-        List<String> sujeitosCandidatos = todosSujeitos.stream()
-                .filter(s -> s.toLowerCase().startsWith(tokens[0]))
-                .limit(5)
-                .collect(Collectors.toList());
+        Optional<String> sujeitoPrincipalOpt = todosSujeitos.stream()
+                .filter(s -> s.toLowerCase().startsWith(primeiroToken))
+                .findFirst();
 
-        if (sujeitosCandidatos.isEmpty()) {
+        if (sujeitoPrincipalOpt.isEmpty()) {
             return Collections.emptyList();
         }
+        String sujeitoPrincipal = sujeitoPrincipalOpt.get();
 
-        // 2. ENCONTRA COMPONENTES SECUNDÁRIOS (usando os outros tokens)
-        Map<String, List<String>> componentesEncontrados = encontrarComponentesSecundarios(tokens);
+        List<String> universoDeFrases = gerarUniversoParaSujeito(sujeitoPrincipal);
 
-        Set<String> sugestoes = new LinkedHashSet<>();
-        int tentativas = 0;
-        while (sugestoes.size() < 20 && tentativas < 100) {
-            String sujeito = getRandomElement(sujeitosCandidatos);
-            String modelo = getRandomElement(data.getModelosDeFrase());
-
-            if (sujeito == null || modelo == null) continue;
-
-            String frase = preencherModelo(modelo, sujeito, componentesEncontrados);
-            frase = frase.substring(0, 1).toUpperCase() + frase.substring(1);
-            sugestoes.add(frase.trim().replaceAll(" +", " "));
-            tentativas++;
+        List<String> sugestoesFiltradas = universoDeFrases;
+        if (tokens.length > 1) {
+            sugestoesFiltradas = universoDeFrases.stream()
+                    .filter(frase -> {
+                        return Arrays.stream(tokens)
+                                .skip(1)
+                                .allMatch(token -> frase.toLowerCase().contains(token));
+                    })
+                    .collect(Collectors.toList());
         }
 
-        List<String> resultadoFinal = new ArrayList<>(sugestoes);
-
-        // 3. NOVA ORDENAÇÃO HÍBRIDA
-        resultadoFinal.sort((s1, s2) -> {
-            // REGRA 1: Prioridade máxima para quem começa com o termo completo
+        sugestoesFiltradas.sort((s1, s2) -> {
             boolean s1Starts = s1.toLowerCase().startsWith(termoLimpo);
             boolean s2Starts = s2.toLowerCase().startsWith(termoLimpo);
             if (s1Starts && !s2Starts) return -1;
             if (!s1Starts && s2Starts) return 1;
-
-            // REGRA 2 (DESEMPATE): Score baseado na quantidade de palavras da busca que a frase contém
-            long s1Score = Arrays.stream(tokens).filter(token -> s1.toLowerCase().contains(token)).count();
-            long s2Score = Arrays.stream(tokens).filter(token -> s2.toLowerCase().contains(token)).count();
-            if (s1Score != s2Score) {
-                return Long.compare(s2Score, s1Score); // Maior score primeiro
-            }
-
-            // Se tudo for igual, não muda a ordem
             return 0;
         });
 
-        return resultadoFinal;
+        return sugestoesFiltradas.stream().limit(20).collect(Collectors.toList());
     }
 
-    private Map<String, List<String>> encontrarComponentesSecundarios(String[] tokens) {
-        Map<String, List<String>> encontrados = new HashMap<>();
-        if (tokens.length <= 1) {
-            return encontrados;
-        }
+    private List<String> gerarUniversoParaSujeito(String sujeito) {
+        Set<String> universo = new LinkedHashSet<>();
+        for (String modelo : data.getModelosDeFrase()) {
+            for (String acao : data.getAcoes().subList(0, Math.min(3, data.getAcoes().size()))) {
+                for (String objeto : data.getObjetos().get("gols").subList(0, 1)) {
+                    String frase = modelo
+                            .replace("{sujeito}", sujeito)
+                            .replace("{acao}", acao)
+                            .replace("{objeto}", objeto)
+                            .replace("{contexto_campeonato}", data.getContextos().get("campeonatos").get(0))
+                            .replace("{contexto_fase}", data.getContextos().get("fases").get(0))
+                            .replace("{contexto_local}", data.getContextos().get("locais").get(0))
+                            .replace("{tempo}", data.getTempos().get(0))
+                            .replace("{conectivo}", data.getConectivos().get(0));
 
-        List<String> outrosTokens = Arrays.asList(tokens).subList(1, tokens.length);
-
-        for (String token : outrosTokens) {
-            if (token.isEmpty()) continue;
-            // Procura em ações
-            for (String acao : data.getAcoes()) {
-                if (acao.toLowerCase().contains(token)) {
-                    encontrados.computeIfAbsent("acoes", k -> new ArrayList<>()).add(acao);
-                }
-            }
-            // Procura em objetos
-            for (String objeto : data.getObjetos().values().stream().flatMap(Collection::stream).collect(Collectors.toList())) {
-                if (objeto.toLowerCase().contains(token)) {
-                    encontrados.computeIfAbsent("objetos", k -> new ArrayList<>()).add(objeto);
+                    frase = frase.substring(0, 1).toUpperCase() + frase.substring(1);
+                    universo.add(frase.trim().replaceAll(" +", " "));
                 }
             }
         }
-        return encontrados;
-    }
-
-    private String preencherModelo(String modelo, String sujeito, Map<String, List<String>> componentesEncontrados) {
-        // Lógica de preenchimento que prioriza os componentes encontrados
-        String acao = getComponenteParaFrase(componentesEncontrados.get("acoes"), data.getAcoes());
-        String objeto = getComponenteParaFrase(componentesEncontrados.get("objetos"), data.getObjetos());
-
-        return modelo
-                .replace("{sujeito}", sujeito)
-                .replace("{acao}", acao)
-                .replace("{objeto}", objeto)
-                .replace("{contexto_campeonato}", getRandomElementFromList(data.getContextos(), "campeonatos"))
-                .replace("{contexto_fase}", getRandomElementFromList(data.getContextos(), "fases"))
-                .replace("{contexto_local}", getRandomElementFromList(data.getContextos(), "locais"))
-                .replace("{tempo}", getRandomElement(data.getTempos()))
-                .replace("{conectivo}", getRandomElement(data.getConectivos()));
-    }
-
-    private String getComponenteParaFrase(List<String> encontrados, List<String> listaCompleta) {
-        if (encontrados != null && !encontrados.isEmpty()) {
-            return getRandomElement(encontrados);
-        }
-        return getRandomElement(listaCompleta);
-    }
-
-    private String getComponenteParaFrase(List<String> encontrados, Map<String, List<String>> mapaCompleto) {
-        if (encontrados != null && !encontrados.isEmpty()) {
-            return getRandomElement(encontrados);
-        }
-        List<String> listaCompleta = mapaCompleto.values().stream().flatMap(Collection::stream).collect(Collectors.toList());
-        return getRandomElement(listaCompleta);
-    }
-
-    private String getRandomElement(List<String> list) {
-        if (list == null || list.isEmpty()) return "";
-        return list.get(random.nextInt(list.size()));
-    }
-
-    private String getRandomElementFromList(Map<String, List<String>> categoryMap, String key) {
-        if (categoryMap == null || !categoryMap.containsKey(key)) return "";
-        return getRandomElement(categoryMap.get(key));
+        return new ArrayList<>(universo);
     }
 }

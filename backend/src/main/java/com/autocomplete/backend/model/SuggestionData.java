@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.util.List;
 import java.util.Map;
 
-@JsonIgnoreProperties(ignoreUnknown = true) // Boa prática para ignorar campos não mapeados
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class SuggestionData {
 
     private Sujeitos sujeitos;
@@ -15,7 +15,7 @@ public class SuggestionData {
     private List<String> conectivos;
     private List<String> modelosDeFrase;
 
-    // Getters e Setters para todos os campos
+
 
     public Sujeitos getSujeitos() { return sujeitos; }
     public void setSujeitos(Sujeitos sujeitos) { this.sujeitos = sujeitos; }

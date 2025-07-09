@@ -1,18 +1,31 @@
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;700&display=swap');
+
+body, html {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+}
+
 .container {
   display: flex;
   justify-content: center;
   align-items: center;
   height: 100vh;
-  background-color: #e8ecf1;
+  background-image: url('./assets/fundo.jpg');
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  font-family: 'Inter', sans-serif;
+  background-color: #188d43;
 }
 
 .card {
   display: flex;
   align-items: center;
   background: white;
-  padding: 24px;
-  border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  padding: 32px;
+  border-radius: 12px;
+  box-shadow: 0 8px 25px rgba(0,0,0,0.15);
 }
 
 .image {
@@ -29,13 +42,20 @@
 
 .content h1 {
   margin: 0;
-  font-size: 28px;
-  color: #222;
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 3rem;
+  letter-spacing: 2px;
+  color: #228B22;
+  text-shadow: none;
 }
 
 .content p {
-  margin: 4px 0 12px;
+  margin: 4px 0 16px;
   color: #555;
+}
+
+.search-wrapper {
+  position: relative;
 }
 
 .search-container {
@@ -44,57 +64,76 @@
 }
 
 .search-container input {
-  padding: 10px;
-  width: 280px;
+  padding: 12px 16px;
+  width: 300px;
   border: 1px solid #ccc;
-  border-radius: 4px 0 0 4px;
+  border-radius: 6px 0 0 6px;
+  font-size: 1rem;
+  font-family: 'Inter', sans-serif;
   outline: none;
 }
 
+.search-container input:focus {
+  border-color: #188d43;
+}
+
 .search-container button {
-  padding: 10px 16px;
-  background-color: #4aa9ff;
-  border: none;
+  padding: 12px 20px;
+  background-color: #228B22;
+  border: 1px solid #228B22;
   color: white;
   font-weight: bold;
-  border-radius: 0 4px 4px 0;
+  font-size: 1rem;
+  border-radius: 0 6px 6px 0;
   cursor: pointer;
 }
 
 .suggestions {
-  max-height: 400px; /* ou 10 * altura de cada item */
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  z-index: 100;
+
+  max-height: 405px;
   overflow-y: auto;
-  border: 1px solid #ccc;
-  margin-top: 10px;
+
+  background: white;
+  border: 1px solid #ddd;
+  border-top: none;
+  border-radius: 0 0 6px 6px;
+
+  margin-top: -1px;
   padding-left: 0;
   list-style: none;
-}
-.suggestion-box {
-  max-height: 300px;
-  overflow-y: auto;
+  box-shadow: 0 8px 16px rgba(0,0,0,0.1);
 }
 
 .suggestions li {
-  padding: 10px;
-  height: 40px;           /* altura fixa */
-  box-sizing: border-box; /* garante que padding não aumente o tamanho */
+  padding: 12px 16px;
+  font-family: 'Inter', sans-serif;
+  font-size: 15px;
+  box-sizing: border-box;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-
 .suggestions li:hover {
-  background-color: #f0f0f0;
+  background-color: #f5f5f5;
   cursor: pointer;
 }
 
+.suggestions li strong {
+  font-weight: 700;
+  color: #333;
+}
 
 .suggestions::-webkit-scrollbar {
   width: 6px;
 }
 
 .suggestions::-webkit-scrollbar-thumb {
-  background: #ccc;
+  background: #dcdcdc;
   border-radius: 3px;
 }
