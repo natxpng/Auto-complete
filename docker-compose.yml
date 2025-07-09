@@ -2,15 +2,17 @@ version: "3.8"
 
 services:
   backend:
-    build: ./backend
+    build:
+      context: ./backend
     ports:
       - "8080:8080"
-    restart: always
+    container_name: autocomplete-backend
 
   frontend:
-    build: ./frontend
+    build:
+      context: ./frontend
     ports:
-      - "3000:3000"
+      - "3000:80"
+    container_name: autocomplete-frontend
     depends_on:
       - backend
-    restart: always
