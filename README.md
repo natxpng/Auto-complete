@@ -12,8 +12,7 @@ Aplicação de sugestões inteligentes de busca sobre futebol.
 
 1. Clone o repositório:
    ```bash
-   git clone https://github.com/natxpng/Auto-complete.git
-````
+   git clone https://github.com/natxpng/Auto-complete.git```
 
 2. Acesse a pasta clonada:
 
