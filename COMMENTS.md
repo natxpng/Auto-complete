@@ -226,6 +226,13 @@ No começo, defini a altura da área de sugestões de forma fixa, o que gerava o
 
 A solução foi tornar esse espaço dinâmico, ou seja, a altura da caixa de sugestões agora se adapta de acordo com a quantidade de frases retornadas. Isso deixou a experiência bem mais fluida e sem cortes visuais.
 
+## Bugs
+Ao tentar deixar a busca mais completa, acabei criando uma limitação e sigo buscando (mesmo após a entrega do desafio/teste) entender o por que dela. Ao estruturar as sugestões, criei um bug que o auto complete apenas funciona quando a busca é iniciada a partir de um sujeito do json (nomes de jogadores como neymar, lionel messi ou times como corinthians, palmeiras, os que estão presentes nos sujeitos do JSON)
+
+Já alterei todo tipo de coisa para eliminar essa limitação/bug, e ainda não descobri como. Infelizmente, percebi que o meu código funciona bem quando a pesquisa se inicia a partir de um sujeito definido, mas não tão bem quando ele foge disso.
+
+a alternatiiva que encontrei foi adicionar outros sujeitos ao JSON até então, mas sigo buscando uma alternativa melhor
+
 ## Conclusão
 
 Para concluir o projeto, realizei algumas estilizações no front-end para melhorar a aparência e usabilidade da interface.
